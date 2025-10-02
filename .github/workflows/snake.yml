@@ -1,31 +1,40 @@
-name: Generate Snake Animation
+name: Generate Snake
 
 on:
   schedule:
-    - cron: "0 */12 * * *"
+    - cron: "59 23 * * *" # todo dia às 23:59 UTC
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build:
-    permissions:
-      contents: write
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
 
-      - name: Generate Snake Animation
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Gerar Snake
         uses: Platane/snk@v3
         with:
-          github_user_name: ${{ github.repository_owner }}
+          github_user_name: davidiass161
           outputs: |
-            dist/github-contribution-grid-snake.svg
-            dist/github-contribution-grid-snake-dark.svg?palette=github-dark
+            output/github-contribution-grid-snake.svg
+            output/github-contribution-grid-snake-dark.svg
 
-      - name: Push Snake Animation to output branch
-        uses: crazy-max/ghaction-github-pages@v3.1.0
+      - name: Mostrar arquivos gerados (debug)
+        run: |
+          ls -la output || true
+
+      - name: Commit e push da snake
+        uses: EndBug/add-and-commit@v9
         with:
-          target_branch: output
-          build_dir: dist
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          author_name: github-actions[bot]
+          author_email: 41898282+github-actions[bot]@users.noreply.github.com
+          message: "chore: gerar snake animation"
+          add: "output/*"
+          branch: main
